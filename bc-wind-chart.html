@@ -1,0 +1,208 @@
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../bc-d3-areachart/bc-d3-areachart.html">
+
+<!--
+Element that draws an areachart of windspeed and direction for a given
+location
+
+##### Example
+
+    <bc-wind-chart
+      backend="forecast.io"
+      height="100"
+      latitude="{{latitude}}"
+      longitude="{{longitude}}"
+      timezone="{{timezone}}"
+      apikey="{{apikey}}"
+      width="300"></bc-wind-chart>
+
+@element bc-wind-chart
+@blurb Element that draws an areachart of windspeed and direction for a given location
+@status alpha
+@homepage http://bilgecode.github.io/bc-wind-chart
+
+##### @todo
+  - add indicator about range (10 days)
+  - cache data locally if possible to reduce api calls
+  - show less hourly points when the scale is large to reduce crowding
+-->
+<polymer-element
+  name="bc-wind-chart"
+  attributes="apikey backend debug domain latitude longitude timezone"
+  extends="bc-d3-areachart">
+
+  <template>
+    <link rel="stylesheet" href="bc-wind-chart.css" />
+    <shadow></shadow>
+  </template>
+
+  <!--
+  <script src="../jquery/jquery.min.js"></script>
+  <script type="text/javascript" src="../timezone-js/src/date.js"></script>
+  -->
+  <script src="../moment/moment.js"></script>
+  <script src="../moment-timezone/builds/moment-timezone-with-data.js"></script>
+  <script src="../d3-plugins/jsonp/jsonp.js"></script>
+  <script src="backends/forecast.io.js"></script>
+  <script src="backends/demo.js"></script>
+  <script>
+
+    Polymer('bc-wind-chart', {
+
+      /**
+       * The `apikey` attribute is needed if the `backend` requires one
+       *
+       * @attribute apikey
+       * @type string
+       */
+      apikey: null,
+
+      /**
+       * The `backend` attribute indicates which source to use. Currently only
+       * forecast.io is supported
+       *
+       * @attribute backend
+       * @type string
+       * @default 'forecast.io'
+       */
+      backend: "forecast.io",
+
+      /**
+       * The `debug` attribute sets the debug flag... console output.
+       *
+       * @attribute debug
+       * @type bool
+       */
+      debug: false,
+
+      /**
+       * The `domain` attribute sets the timeframe to display
+       *
+       * @attribute domain
+       * @type {Array}
+       */
+      domain: [],
+
+      /**
+       * The `height` attribute indicates which height in pixels.
+       *
+       * @attribute height
+       * @type int
+       */
+      height: 120,
+
+      /**
+       * The `latitude` attribute is the latitude to show wind data for
+       *
+       * @attribute latitude
+       * @type float
+       */
+      latitude: null,
+
+      /**
+       * The `longitude` attribute is the longitude to show wind data for
+       *
+       * @attribute longitude
+       * @type float
+       */
+      longitude: null,
+
+      /**
+       * The `timezone` attribute indicates which timezone to display the data
+       * in.
+       *
+       * @attribute timezone
+       * @type float
+       */
+      timezone: null,
+
+      /**
+       * The `width` attribute indicates which width in pixels.
+       *
+       * @attribute width
+       * @type int
+       */
+      width: 500,
+
+      observe: {
+        "latitude": "getData",
+        "longitude": "getData",
+        "timezone": "getData",
+        "apikey": "getData"
+      },
+
+      /**
+       * The `getData` method collects the wind data from the backend. This
+       * only runs when all the necessary attributes have been set. The result
+       * is stored in `this.data`.
+       *
+       * @method getData
+       * @return {Object} Returns undefined.
+       */
+      getData: function() {
+        if(this.latitude == null || this.longitude == null || this.timezone == null)
+          return;
+        if(this.backend == "forecast.io") {
+          this.data = getForecastIOData(this);
+        }
+        if(this.backend == "demo") {
+          this.data = getDemoData(this);
+        }
+        else {
+          console.error("invalid backend");
+        }
+      },
+
+      /**
+       * The `drawPoints` overrides the parent method from areachart to draw
+       * arrows indicating the bearing of the wind
+       *
+       * @method drawPoints
+       * @return {Object} Returns undefined.
+       */
+      drawPoints: function(data, className) {
+        var xS = this.xScale;
+        var yS = this.yScale;
+        var self = this;
+
+        // Draw arrows for each data point indicating wind direction
+        var arrows = this.chartContainer.append('g')
+          .selectAll('.data-point-' + className)
+          .data(data);
+
+        // @todo: handle undefined bearing
+        arrows
+          .enter()
+          .append('svg:polygon')
+          .attr('class', 'data-point data-point-' + className)
+          .attr('points', function(d) {
+            return self.getIconPoints(xS(d.xVal), yS(d.yVal))
+          })
+          .attr("transform", function(d) {
+            return "rotate(" + d.bearing + " " + xS(d.xVal) + " " + yS(d.yVal) + ")";
+          })
+      },
+
+      /**
+       * Generates the points of the polygon for a wind direction icon
+       *
+       * @method getIconPoints
+       */
+      getIconPoints: function(x, y) {
+        return [
+          [x, y - 3],
+          [x - 6, y - 8],
+          [x - 6, y - 8],
+          [x, y + 10],
+          [x, y + 10],
+          [x + 6, y - 8],
+          [x + 6, y - 8],
+          [x, y - 3],
+        ]
+      }
+
+    });
+
+  </script>
+
+</polymer-element>

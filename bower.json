@@ -1,0 +1,13 @@
+{
+  "name": "bc-wind-chart",
+  "version": "0.0.1",
+  "keywords": "seed, polymer, web-components",
+  "main": "bc-wind-chart.html",
+  "dependencies": {
+    "bc-d3-areachart": "bilgecode/bc-d3-areachart#~0.4",
+    "d3-plugins": "d3/d3-plugins",
+    "polymer": "Polymer/polymer#~0.4",
+    "moment": "~2.8.3",
+    "moment-timezone": "~0.2.2"
+  }
+}

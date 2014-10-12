@@ -1,0 +1,95 @@
+<!doctype html>
+<html>
+<head>
+  <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
+  <title>bc-wind-chart Demo</title>
+
+  <script src="../platform/platform.js"></script>
+  <link rel="import" href="bc-wind-chart.html">
+
+  <style>
+    html {
+      background-color: #333;
+      color: white;
+      padding: 40px;
+    }
+    a, a:visited {
+      color: steelblue;
+    }
+
+    bc-wind-chart::shadow .data-point {
+      fill: #222;
+      fill-opacity: .5;
+      stroke: black;
+      stroke-width: 1px;
+    }
+
+    bc-wind-chart::shadow .area-chart {
+      stroke-opacity: 1;
+      fill: steelblue;
+    }
+  </style>
+
+</head>
+<body unresolved>
+
+  <p>A `bc-wind-chart` looks like this:</p>
+
+  <template is="auto-binding" id="demo-container">
+    <bc-wind-chart
+      backend="{{backend}}"
+      debug="{{debug}}"
+      domain="{{domain}}"
+      height="{{height}}"
+      latitude="{{latitude}}"
+      longitude="{{longitude}}"
+      showpoints="{{showpoints}}"
+      timezone="{{timezone}}"
+      width="{{width}}"></bc-wind-chart>
+
+    <h2>Timezone: {{timezone}}</h2>
+
+    <h2>Position</h2>
+    <dl>
+      <dt>Latitude:</dt>
+      <dd>{{latitude}}</dd>
+      <dt>Longitude:</dt>
+      <dd>{{longitude}}</dd>
+    </dl>
+
+    <h2>Domain:</h2>
+    <dl>
+      <dt>Start:</dt>
+      <dd>{{domain[0]}}</dd>
+      <dt>End:</dt>
+      <dd>{{domain[1]}}</dd>
+    </dl>
+
+    <p><em>This uses demo JSON. Change the backend to use other data.</em></p>
+  </template>
+
+  <p>
+    <a href="index.html">documentation</a> |
+    <a href="https://github.com/BilgeCode/bc-wind-chart">github</a>
+  </p>
+
+  <script src="../moment/moment.js"></script>
+  <script src="../moment-timezone/builds/moment-timezone-with-data.js"></script>
+  <script>
+    var template = document.getElementById('demo-container');
+    template.timezone = "America/Los_Angeles";
+    template.latitude = 37.8267;
+    template.longitude = -122.423;
+    template.height = 80;
+    template.width = 400;
+    template.domain = [
+      moment.tz("2014-10-12", template.timezone).add(-2, 'days'),
+      moment.tz("2014-10-12", template.timezone).add(7, 'days')
+    ];
+    template.backend = "demo";
+    template.showpoints = true;
+    template.debug = true;
+  </script>
+
+</body>
+</html>
