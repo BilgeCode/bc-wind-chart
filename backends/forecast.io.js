@@ -26,7 +26,7 @@ function getForecastIOData(bcWindChart) {
 
     // Get the hourly data
     var hourlyData = json.hourly.data;
-    for(var i=0; i < hourlyData.length; i+=3) {
+    for(var i=0; i < hourlyData.length; i+=4) {
       var time = moment.tz(
         hourlyData[i].time * 1000,
         self.timezone

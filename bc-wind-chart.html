@@ -28,7 +28,7 @@ location
 -->
 <polymer-element
   name="bc-wind-chart"
-  attributes="apikey backend debug domain latitude longitude timezone"
+  attributes="apikey backend debug domain latitude longitude timezone showpoints"
   extends="bc-d3-areachart">
 
   <template>
@@ -108,6 +108,16 @@ location
       longitude: null,
 
       /**
+       * The `showpoints` attribute indicates if arrows should be shown for
+       * wind direction. Overrides bc-d3-areachart's default.
+       *
+       * @attribute showpoints
+       * @type bool
+       * @default true
+       */
+      showpoints: true,
+
+      /**
        * The `timezone` attribute indicates which timezone to display the data
        * in.
        *
@@ -123,6 +133,14 @@ location
        * @type int
        */
       width: 500,
+
+      /**
+       * The `interpolation` attribute passes the interpolation to the d3.area
+       *
+       * @attribute interpolation
+       * @type string
+       */
+      interpolation: "linear",
 
       observe: {
         "latitude": "getData",
@@ -143,10 +161,10 @@ location
         if(this.latitude == null || this.longitude == null || this.timezone == null)
           return;
         if(this.backend == "forecast.io") {
-          this.data = getForecastIOData(this);
+          getForecastIOData(this);
         }
-        if(this.backend == "demo") {
-          this.data = getDemoData(this);
+        else if(this.backend == "demo") {
+          getDemoData(this);
         }
         else {
           console.error("invalid backend");
@@ -181,6 +199,28 @@ location
           .attr("transform", function(d) {
             return "rotate(" + d.bearing + " " + xS(d.xVal) + " " + yS(d.yVal) + ")";
           })
+      },
+
+      /**
+       * The `redrawPoints` method redraws the wind direction arrows
+       *
+       * @method redrawPoints
+       * @return {Object} Returns undefined.
+       */
+      redrawPoints: function(data, className) {
+        var xS = this.xScale;
+        var yS = this.yScale;
+        var self = this;
+
+        this.chartContainer
+          .selectAll('.data-point-' + className)
+          .attr('points', function(d) {
+            return self.getIconPoints(xS(d.xVal), yS(d.yVal))
+          })
+          .attr("transform", function(d) {
+            return "rotate(" + d.bearing + " " + xS(d.xVal) + " " + yS(d.yVal) + ")";
+          })
+          .data(data);
       },
 
       /**
