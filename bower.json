@@ -1,7 +1,7 @@
 {
   "name": "bc-wind-chart",
   "version": "0.0.3",
-  "keywords": "seed, polymer, web-components",
+  "keywords": ["seed", "polymer", "web-components"],
   "main": "bc-wind-chart.html",
   "dependencies": {
     "bc-d3-areachart": "bilgecode/bc-d3-areachart#^0.4.1",
